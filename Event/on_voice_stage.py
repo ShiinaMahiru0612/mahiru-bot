@@ -39,8 +39,8 @@ class OnVCUpdate(commands.Cog):
                 timestamp=datetime.now(HCM),
             )
 
-            embed.add_field(name="Trước đó", value=before.channel.mention, inline=False)
-            embed.add_field(name="Sau khi cập nhật", value=after.channel.mention, inline=False)
+            embed.add_field(name="Trước đó", value=before.channel, inline=False)
+            embed.add_field(name="Sau khi cập nhật", value=after.channel, inline=False)
 
             await channel.send(embed=embed)
 
