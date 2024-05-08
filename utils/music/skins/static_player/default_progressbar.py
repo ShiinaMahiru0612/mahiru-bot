@@ -9,7 +9,7 @@ from utils.music.models import LavalinkPlayer
 from utils.others import ProgressBar, PlayerControls
 
 
-class DefaultProgressbarStaticSkin:
+class DefaultStaticSkin:
 
     __slots__ = ("name", "preview")
 
@@ -47,49 +47,81 @@ class DefaultProgressbarStaticSkin:
                 icon_url="https://cdn.discordapp.com/attachments/480195401543188483/896013933197013002/pause.png"
             )
 
-        if player.current.is_stream:
-            duration = "```ansi\n🔴 [31;1m Livestream[0m```"
-        else:
+        good_p, norm_ping, weak_p = range(1, 100), range(101, 200), range(201, 100000)
 
-            progress = ProgressBar(
-                player.position,
-                player.current.duration,
-                bar_count=8
-            )
-
-            duration = f"```ansi\n[34;1m[{time_format(player.position)}] {('-'*progress.start)}[0m🔴️[36;1m{' '*progress.end} " \
-                       f"[{time_format(player.current.duration)}][0m```\n"
+    
             
         duration1 = "> 🔴 **Thời lượng:** `Livestream`\n" if player.current.is_stream else \
-            (f"> ⏰ **Thời lượng:** `{time_format(player.current.duration)} [`" +
+            (f"> <:timeout:1155781760571949118> **Thời lượng:** `{time_format(player.current.duration)} [`" +
             f"<t:{int((disnake.utils.utcnow() + datetime.timedelta(milliseconds=player.current.duration - player.position)).timestamp())}:R>`]`\n"
             if not player.paused else '')
 
         vc_txt = ""
+        src_name = fix_characters(player.current.info['sourceName'], limit=16)
+        src_emoji = ""
+        if src_name == "spotify":
+            s_name = "Spotify"
+            src_emoji = "<:spo:1197427989630156843>"
+        elif src_name == "youtube":
+             s_name = "YouTube"
+             src_emoji = "<:Youtube:1197428387917082735>"
+        elif src_name == "soundcloud":
+                s_name = "SoundCloud"
+                src_emoji = "<:soundcloud:1197427982499856435>"
+        elif src_name == "dezzer":
+             s_name = "Dezzer"
+             src_emoji = "<:deezer:1197427994533314600>"
+        elif src_name == "twitch":
+             s_name = "Twitch"
+             src_emoji = "<:Twitch:1197427999981703238>"
+        elif src_name == "applemusic":
+             s_name = "Apple Music"
+             src_emoji = "<:applemusic:1232560350449242123>"
+        else:
+             s_name = "Không biết"
+             src_emoji = "<:LogoModSystem:1155781711024635934>"
 
         txt = f"[`{fix_characters(player.current.single_title, limit=21)}`]({player.current.uri})\n\n" \
-              f"{duration1}\n" \
+              f"{duration1}" \
+              f"> {src_emoji} **⠂Nguồn:** [`{s_name}`]({player.current.uri})\n" \
               f"> <:author:1140220381320466452>  **⠂Tác giả:** {player.current.authors_md}\n" \
-              f"> <:peppe_he:1161843804547072010> **⠂Người gọi bài:** <@{player.current.requester}>\n" \
               f"> <:volume:1140221293950668820> **⠂Âm lượng:** `{player.volume}%`\n" \
-              f"> <:host:1140221179920138330> **⠂**{player}\n" \
-              f"> 🌐 **⠂Vùng:** {player.node.region.title()}\n" \
+              f"> <:host:1140221179920138330> **⠂Máy chủ:** {player}\n" \
+              f"> 🌐 **⠂Vùng:** {player.node.region.title()}" \
               
         if not player.ping:
-            txt += f"> <a:loading:1204300257874288681> **⠂Đang lấy dữ liệu từ máy chủ**\n"
+            txt += f"\n> <a:loading:1204300257874288681> **⠂Đang lấy dữ liệu từ máy chủ**"
         else:
-            txt += f"> <a:loading:1204300257874288681> ╰[Độ trễ:{player.ping}ms\n" \
+            if player.ping in good_p:
+                txt += f"\n> <:emoji_57:1173431627607715871> **⠂Độ trễ:** `{player.ping}ms`"
+            elif player.ping in norm_ping:
+                txt += f"\n> <:emoji_58:1173431708071247983> **⠂Độ trễ:** `{player.ping}ms`"
+            elif player.ping in weak_p:
+                txt += f"\n> <:emoji_59:1173431772017590332> **⠂Độ trễ:** `{player.ping}ms`"
+
+        if not player.current.autoplay:
+                    txt += f"\n> ✋ **⠂Được yêu cầu bởi:** <@{player.current.requester}>"
+        else:
+                    try:
+                        mode = f" [`Chế độ tự động`]({player.current.info['extra']['related']['uri']})"
+                    except:
+                        mode = "`Chế độ tự động`"
+                    txt += f"\n> 👍 **⠂Được yêu cầu bởi:** {mode}"
+
+
+        try:
+            vc_txt += f"\n> <:AyakaCozy_mella:1135418504590393415> **⠂Người dùng đang kết nối:** `{len(player.guild.me.voice.channel.members) - 1}`"
+        except AttributeError:
+            pass
+
+        try:
+            vc_txt += f"\n> 🔊 **⠂Kênh** {player.guild.me.voice.channel.mention}"
+        except AttributeError:
+            pass
         
         if player.current.track_loops:
             txt += f"\n> <:loop:1140220877401772092> **⠂Lặp lại còn lại:** `{player.current.track_loops}` " \
 
-        if player.current.autoplay:
-            txt += f"> <:music:1140220553135931392> **⠂Tự động thêm nhạc:** `Bật`"
-
-            try:
-                txt += f" [`(link nhạc.)`]({player.current.info['extra']['related']['uri']})\n"
-            except:
-                txt += "\n"
 
         if player.loop:
             if player.loop == 'current':
@@ -110,21 +142,19 @@ class DefaultProgressbarStaticSkin:
             txt += f"\n> <:library:1140220586640019556> **⠂Playlist:** [`{fix_characters(player.current.playlist_name, limit=16)}`]({player.current.playlist_url})"
 
         if (qlenght:=len(player.queue)) and not player.mini_queue_enabled:
-            txt += f"\n> <a:raging:1117802405791268925> **⠂Bài hát trong dòng:** `{qlenght}`"
+            txt += f"\n> <:musicalbum:1183394320292790332> **⠂Bài hát đang chờ:** `{qlenght}`"
 
         if player.keep_connected:
             txt += f"\n> <:247:1140230869643169863> **⠂Chế độ 24/7:** `Kích hoạt`"
 
-        elif player.restrict_mode:
-            txt += f"\n> <:GuraCityCopStop:1135921852888395797> **⠂Hạn chế:** `Kích hoạt`"
+        if player.restrict_mode:
+            txt += f"\n> <:restrictions:1183393857858191451> **⠂Hạn chế:** `Kích hoạt`"
 
         txt += f"{vc_txt}\n"
 
         if player.command_log:
-            txt += f"``Tương tác cuối cùng``\n"
-            txt += f"> {player.command_log_emoji} - {player.command_log}\n"
-
-        txt += duration
+            txt += f"> {player.command_log_emoji}``Tương tác cuối cùng``{player.command_log_emoji}\n"
+            txt += f"> {player.command_log}\n"
 
         if qlenght and player.mini_queue_enabled:
 
@@ -145,22 +175,22 @@ class DefaultProgressbarStaticSkin:
                         queue_duration += t.duration
 
                 if queue_duration:
-                    embed_queue.description += f"\n`[⌛ Các bài hát kết thúc sau` <t:{int((disnake.utils.utcnow() + datetime.timedelta(milliseconds=(queue_duration + (player.current.duration if not player.current.is_stream else 0)) - player.position)).timestamp())}:R> `⌛]`"
+                    embed_queue.description += f"\n`[⌛ Các bài hát sẽ kết thúc sau` <t:{int((disnake.utils.utcnow() + datetime.timedelta(milliseconds=(queue_duration + (player.current.duration if not player.current.is_stream else 0)) - player.position)).timestamp())}:R> `⌛]`"
 
-            embed_queue.set_image(url="https://media.discordapp.net/attachments/779998700981321749/865589761858600980/ayakapfpBanner2.gif")
+            embed_queue.set_image(url="https://cdn.discordapp.com/attachments/554468640942981147/1127294696025227367/rainbow_bar3.gif")
 
         embed.description = txt
         embed.set_thumbnail(url=player.current.thumb)
         embed.set_footer(
-            text="Kadin Music system",
-            icon_url="https://cdn.discordapp.com/emojis/986511889142009856.webp?size=96&quality=lossless",
+            text=f"Music system || {time_format(player.position)} / {time_format(player.current.duration)}" if not player.paused else f"Music system || Tạm dừng",
+            icon_url="https://i.ibb.co/fdXjBdP/1225091899606434012.gif",
         )
 
         data["embeds"] = [embed_queue, embed] if embed_queue else [embed]
 
         data["components"] = [
-            
         ]
+
 
         try:
             if isinstance(player.text_channel.parent, disnake.ForumChannel):
@@ -171,4 +201,4 @@ class DefaultProgressbarStaticSkin:
         return data
 
 def load():
-    return DefaultProgressbarStaticSkin()
+    return DefaultStaticSkin()

@@ -177,13 +177,13 @@ class DefaultStaticSkin:
                 if queue_duration:
                     embed_queue.description += f"\n`[⌛ Các bài hát sẽ kết thúc sau` <t:{int((disnake.utils.utcnow() + datetime.timedelta(milliseconds=(queue_duration + (player.current.duration if not player.current.is_stream else 0)) - player.position)).timestamp())}:R> `⌛]`"
 
-            embed_queue.set_image(url="https://i.ibb.co/wKwpJZQ/ayakapfp-Banner2.gif")
+            embed_queue.set_image(url="https://cdn.discordapp.com/attachments/554468640942981147/1127294696025227367/rainbow_bar3.gif")
 
         embed.description = txt
         embed.set_thumbnail(url=player.current.thumb)
         embed.set_footer(
-            text=f"Chisadin music system || {time_format(player.position)} / {time_format(player.current.duration)}" if not player.paused else f"Chisadin music system || Tạm dừng",
-            icon_url="https://i.ibb.co/YtHsQWH/1125034330088034334.webp",
+            text=f"Music system || {time_format(player.position)} / {time_format(player.current.duration)}" if not player.paused else f"Music system || Tạm dừng",
+            icon_url="https://i.ibb.co/fdXjBdP/1225091899606434012.gif",
         )
 
         data["embeds"] = [embed_queue, embed] if embed_queue else [embed]
