@@ -40,13 +40,16 @@ class Serverlog(commands.Cog):
                         if remove["status"] == "failed":
                             await ctx.send("Đã xảy ra lỗi", delete_after=5)
                         await ctx.edit_original_response("Đã xóa dữ liệu", delete_after=5)
+                        
                     else:
-                        await self.bot.serverdb.setupserverlog(ctx.guild.id, channel.id, 0)
-                    embed = disnake.Embed(title="Server Log", description=f"<:verify:1134033164151566460> Đã thay đổi kênh server log cho máy chủ {ctx.author.guild.name}\nKênh đã thiết lập: {channel.mention}")
-                    embed.set_thumbnail("https://media.discordapp.net/stickers/1039992459209490513.png")
-                    embed.set_footer(text=f"Thiết lập bởi {ctx.author.name} - {ctx.author.id}", 
-                                     icon_url=ctx.author.avatar.url)
-                    await ctx.send(embed=embed)
+                        old_channel_id = await self.bot.serverdb.get_log_channel(ctx.guild_id)
+                        await self.bot.serverdb.remove_server_log(ctx.guild_id, old_channel_id["channel_id"])
+                        await self.bot.serverdb.setupserverlog(ctx.guild.id, channel.id)
+                        embed = disnake.Embed(title="Server Log", description=f"<:verify:1134033164151566460> Đã thay đổi kênh server log cho máy chủ {ctx.author.guild.name}\nKênh đã thiết lập: {channel.mention}")
+                        embed.set_thumbnail("https://media.discordapp.net/stickers/1039992459209490513.png")
+                        embed.set_footer(text=f"Thiết lập bởi {ctx.author.name} - {ctx.author.id}", 
+                                        icon_url=ctx.author.avatar.url)
+                        await ctx.send(embed=embed)
 
     @commands.cooldown(1, 300, commands.BucketType.guild) 
     @commands.bot_has_guild_permissions(manage_roles=True, manage_guild=True)
