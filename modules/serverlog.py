@@ -56,11 +56,11 @@ class Serverlog(commands.Cog):
     async def ignorerole(self, ctx: Union[CustomContext, ApplicationCommandInteraction], role: disnake.Role):
         await ctx.response.defer(ephemeral=True)
         check = await self.bot.serverdb.check_database(ctx.guild.id)
-        role_check = await self.bot.serverdb.check_role(ctx.guild.id, role.id)
         ADD_embed = disnake.Embed(title="ADD ROLE", description=f"Đã thêm role {role.name} vào danh sách bỏ qua", color=disnake.Color.green()).set_footer(text=f"Người thực hiện: {ctx.author}", icon_url=self.bot.user.avatar)
         REMOVE_embed = disnake.Embed(title="REMOVE ROLE", description=f"Đã xóa role {role.name} khỏi danh sách bỏ qua", color=disnake.Color.green()).set_footer(text=f"Người thực hiện: {ctx.author}", icon_url=self.bot.user.avatar)
         if check["status"] == "Data_Found":
-                        if role_check["info"] == False:
+                        role_check = await self.bot.serverdb.check_role(ctx.guild.id, role.id)
+                        if role_check["info"] == False: #?
                             await self.bot.serverdb.setup_ignored_roles(ctx.guild.id, role.id)
                             await ctx.send(embed=ADD_embed)
                         elif role_check["info"] == "No":

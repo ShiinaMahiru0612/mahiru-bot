@@ -8,7 +8,6 @@ from utils.music.converters import fix_characters, time_format, music_source_ima
 from utils.music.models import LavalinkPlayer
 from utils.others import PlayerControls
 
-
 class DefaultProgressbarSkin:
 
     __slots__ = ("name", "preview")
@@ -174,24 +173,23 @@ class DefaultProgressbarSkin:
                 if queue_duration:
                     embed_queue.description += f"\n`[⌛ Các bài hát sẽ kết thúc sau` <t:{int((disnake.utils.utcnow() + datetime.timedelta(milliseconds=(queue_duration + (player.current.duration if not player.current.is_stream else 0)) - player.position)).timestamp())}:R> `⌛]`"
 
-            embed_queue.set_image(url="https://i.ibb.co/wKwpJZQ/ayakapfp-Banner2.gif")
+            embed_queue.set_image(url="https://cdn.discordapp.com/attachments/554468640942981147/1127294696025227367/rainbow_bar3.gif")
 
         embed.description = txt
-        # embed.set_image(url=player.current.thumb if player.is_paused == False else "https://i.ibb.co/wKwpJZQ/ayakapfp-Banner2.gif")
         embed.set_thumbnail(url=player.current.thumb)
         embed.set_footer(
-            text=f"Chisadin music system || {time_format(player.position)} / {time_format(player.current.duration)}" if not player.current.is_stream else "Chisadin music system || Đang phát trực tiếp" if not player.paused else "Chisadin music system || Tạm dừng",
-            icon_url="https://i.ibb.co/YtHsQWH/1125034330088034334.webp",
+            text=f"Mahiru music system || {time_format(player.position)} / {time_format(player.current.duration)}" if not player.current.is_stream else "Mahiru music system || Đang phát trực tiếp" if not player.paused else "Mahiru music system || Tạm dừng",
+            icon_url="https://i.ibb.co/fdXjBdP/1225091899606434012.gif",
         )
 
         data["embeds"] = [embed_queue, embed] if embed_queue else [embed]
 
         data["components"] = [
-            disnake.ui.Button(emoji="<:stop:1140221258575925358>", custom_id=PlayerControls.stop, style=disnake.ButtonStyle.red),
+            disnake.ui.Button(emoji="<:stop:1172811767525675028>", custom_id=PlayerControls.stop, style=disnake.ButtonStyle.red),
             disnake.ui.Button(emoji="⏮️", custom_id=PlayerControls.back, style=disnake.ButtonStyle.green),
             disnake.ui.Button(emoji="⏯️", custom_id=PlayerControls.pause_resume, style=get_button_style(player.paused)),
             disnake.ui.Button(emoji="⏭️", custom_id=PlayerControls.skip, style=disnake.ButtonStyle.green),
-            disnake.ui.Button(emoji="<:addsong:1140220013580664853>", custom_id=PlayerControls.add_song, style=disnake.ButtonStyle.green, label="Thêm nhạc", disabled= True if player.paused else False),
+            disnake.ui.Button(emoji="<:pnv_cong1:1167732512336920606>", custom_id=PlayerControls.add_song, style=disnake.ButtonStyle.green, label="Thêm nhạc", disabled= True if player.paused else False),
             disnake.ui.Select(
                 placeholder="Lựa chọn khác:",
                 custom_id="musicplayer_dropdown_inter",
