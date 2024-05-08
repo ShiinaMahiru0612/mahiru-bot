@@ -67,7 +67,7 @@ class WebSocket:
         data = {
             "Authorization": self._node.password,
             "User-Id": str(self._node.uid),
-            "Client-Name": "Wavelink/ayakaProject",
+            "Client-Name": "Wavelink/mahiruProject",
         }
 
         if self._node.version == 3:
